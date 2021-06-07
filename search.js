@@ -1,6 +1,30 @@
 const searchBtn = document.getElementById('search_btn');
 searchBtn.addEventListener('click', search);
 
+function getUrlParams(url) {     
+    var params = {};  
+    
+    url.replace(/[?&]+([^=&]+)=([^&]*)/gi, 
+    	function(str, key, value) { 
+        	params[key] = value; 
+        }
+    );     
+    
+    return params; 
+}
+
+function getCurrentUrl() {
+    return new Promise((resolve, reject) => {
+        chrome.tabs.query({currentWindow: true, active: true}, function(tabs){
+            if(tabs[0].url.length > 0) {
+                resolve(tabs[0].url);
+            } else {
+                reject('Failed to get the current URL');
+            }
+        });
+    });
+}
+
 // Serialize XML file 
 function parseXML(vidCC) {
     var parser = new DOMParser();
