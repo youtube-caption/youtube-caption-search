@@ -9,12 +9,27 @@ function findTimeStamp(searchWord, parsedCC) {
     var timeStamps = [];
     var objCC = parsedCC.getElementsByTagName("text");
     for (var i = 0; i < objCC.length; i++) {
-        if (((objCC[i].childNodes[0].nodeValue).toLowerCase()).includes(searchWord)) {
+        let targetSentence = objCC[i].childNodes[0].nodeValue;
+        targetSentence = targetSentence.toLowerCase();
+        targetSentence = decodeSpecialCharacter(targetSentence);
+
+        if (targetSentence.includes(searchWord)) {
             var timeVal = objCC[i].getAttribute("start");
             timeStamps.push(timeVal);
         }
     }
     return timeStamps;
+}
+
+function decodeSpecialCharacter(string) {
+    const decodedString =  string.replace(/&amp;/g, '&')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'")
+        .replace(/&#96;/g, "`");
+    
+    return decodedString;
 }
 
 
