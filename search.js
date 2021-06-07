@@ -1,3 +1,5 @@
+const searchBtn = document.getElementById('search_btn');
+searchBtn.addEventListener('click', search);
 
 // Serialize XML file 
 function parseXML(vidCC) {
