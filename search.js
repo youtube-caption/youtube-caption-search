@@ -46,7 +46,10 @@ function findTimeStamp(searchWord, parsedCC) {
 
         if (targetSentence.includes(searchWord)) {
             var timeVal = objCC[i].getAttribute("start");
-            timeStamps.push(timeVal);
+            timeStamps.push({
+                sentence: targetSentence,
+                timestamp: timeVal,
+            });
         }
     }
     return timeStamps;
@@ -87,12 +90,22 @@ function requestApi(lang, videoCode) {
 }
 
 
+function goToUrl(url) {
+    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+        const currTab = tabs[0];
+        if (currTab) {
+            chrome.tabs.update(currTab.id, {url: url});
+        }
+    });
+}
+
+
 async function search() {
     const searchWordField = document.getElementById('searchWordField');
     const searchWord = searchWordField.value;
 
-    document.getElementById("exists").innerHTML = '';
-    document.getElementById("test").innerHTML = '';
+    const resultView = document.getElementById('result');
+    resultView.innerHTML = '';
 
     const currentUrl = await getCurrentUrl();
     const params = getUrlParams(currentUrl);
@@ -102,12 +115,28 @@ async function search() {
     parsedCC = parseXML(vidCC);
 
     var timeStampsList = findTimeStamp(searchWord, parsedCC);
-    if (timeStampsList.length > 0) {
-        document.getElementById("exists").innerHTML += "The time stamps are as follows:  \n";
-    }
+
+    const urlDict = {};
+
     for (var i = 0; i < timeStampsList.length; i++) {
-        document.getElementById("test").innerHTML += timeStampsList[i] + "\n";
+        const res = timeStampsList[i];
+        const timeStamp = Math.round(+res.timestamp);
+        resultView.innerHTML += `
+            <div>
+                <button id="result-${i}">
+                    ${timeStamp} : [i${res.sentence}
+                </button>
+                <br>
+            </div>
+        `;
+
+        urlDict[`result-${i}`] = `https://www.youtube.com/watch?v=${videoCode}&t=${timeStamp}s`;
     }
 
+    for(let id in urlDict) {
+        const resultLine = document.getElementById(id);
+        resultLine.addEventListener('click', () => {
+            goToUrl(urlDict[id]);
+        })
+    }
 }
-
