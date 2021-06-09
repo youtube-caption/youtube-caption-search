@@ -5,13 +5,21 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="common.css">
     <title>Youtube Search</title>
 </head>
 
 <body>
-    <input type="text" name="" id="searchWordField">
-    <button id="search_btn">Search</button>
+    <div id = container>
+        <div id="search_box">
+            <input class="vertical_align" type="text" name="" id="searchWordField">
+            <button class="search-button"><img src="magnify.png"></button>
+        </div>
+        <div class="blank_space"></div>
+    </div>
+
     <div id="result"></div>
+    <div class="bottom_blank_space"></div>
 
     <!-- JavaScript -->
     <script src="./search.js"></script>
