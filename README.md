@@ -16,4 +16,5 @@ Errors to fix:
 3. error pop-ups
     1. no results found
     2. not a proper youtube link to access
-    3. no transcript found for youtube video
+    3. no transcript found for youtube video (found error: change link to cc finder (list:type), and get the required lang-code to display cc)
+    4. drop down for languages
