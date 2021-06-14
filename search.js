@@ -8,6 +8,7 @@ searchField.addEventListener('keydown', (event) => {
     }
 });
 
+
 function getUrlParams(url) {
     var params = {};
 
@@ -34,49 +35,23 @@ function getCurrentUrl() {
 }
 
 
-// Deserialize XML file 
-function parseXML(vidCC) {
-    var parser = new DOMParser();
-    return parser.parseFromString(vidCC, "text/xml");
-}
-
-
-function findTimeStamp(searchWord, parsedCC) {
-    var timeStamps = [];
-    var objCC = parsedCC.getElementsByTagName("text");
-    for (var i = 0; i < objCC.length; i++) {
-        let targetSentence = objCC[i].childNodes[0].nodeValue;
-        targetSentence = targetSentence.toLowerCase();
-        targetSentence = decodeSpecialCharacter(targetSentence);
-
-        if (targetSentence.includes(searchWord)) {
-            var timeVal = objCC[i].getAttribute("start");
-            timeStamps.push({
-                sentence: targetSentence,
-                timestamp: timeVal,
-            });
-        }
-    }
-    return timeStamps;
-}
-
-
 function decodeSpecialCharacter(string) {
-    const decodedString = string.replace(/&amp;/g, '&')
+    return string.replace(/&amp;/g, '&')
         .replace(/&lt;/g, '<')
         .replace(/&gt;/g, '>')
         .replace(/&quot;/g, '"')
         .replace(/&#39;/g, "'")
         .replace(/&#96;/g, "`");
-
-    return decodedString;
 }
 
 
-function requestApi(lang, videoCode) {
+async function requestApi(videoCode, name = '', lang = '') {
     return new Promise((resolve, reject) => {
         const request = new XMLHttpRequest();
-        const url = `http://video.google.com/timedtext?lang=${lang}&v=${videoCode}`;
+        var url = `http://video.google.com/timedtext?type=list&v=${videoCode}`;
+        if (lang != '') {
+            url = `http://video.google.com/timedtext?name=${name}&lang=${lang}&v=${videoCode}`;
+        }
         request.open('GET', url);
 
         request.onload = function () {
@@ -95,6 +70,82 @@ function requestApi(lang, videoCode) {
 }
 
 
+function parseXML(vidCC) {
+    var parser = new DOMParser();
+    return parser.parseFromString(vidCC, "text/xml");
+}
+
+
+function findCCType(parsedType) {
+    var tupledTypes = [];
+    var objType = parsedType.getElementsByTagName("track");
+    for (var trackTag of objType) {
+        console.log(trackTag);
+        let trackName = trackTag.getAttribute("name");
+        console.log(trackName);
+        let trackLang = trackTag.getAttribute("lang_code");
+        console.log(trackLang);
+        tupledTypes.push({
+            name: trackName,
+            langcode: trackLang,
+        });
+    }
+    return tupledTypes;
+}
+
+
+function findTimeStamp(searchWord, parsedCC) {
+    var timeStamps = [];
+    var objCC = parsedCC.getElementsByTagName("text");
+
+    for (var textTag of objCC) {
+        let targetSentence = textTag.childNodes[0].nodeValue;
+        targetSentence = targetSentence.toLowerCase();
+        targetSentence = decodeSpecialCharacter(targetSentence);
+
+        if (targetSentence.includes(searchWord)) {
+            var timeVal = textTag.getAttribute("start");
+            timeStamps.push({
+                sentence: targetSentence,
+                timestamp: timeVal,
+            });
+        }
+    }
+    return timeStamps;
+}
+
+
+function pad(num, size) {
+    num = num.toString();
+    while (num.length < size) num = "0" + num;
+    return num;
+}
+
+
+function displayResults(list, resultView, videoCode) {
+    const urlDict = {};
+
+    for (var i = 0; i < list.length; i++) {
+        const res = list[i];
+        const timeStamp = Math.round(+res.timestamp);
+        const hour = parseInt(timeStamp / 3600);
+        const min = parseInt((timeStamp % 3600) / 60);
+        const sec = timeStamp % 60;
+
+        resultView.innerHTML += `
+            <div class="card">
+                <p id="result-${i}">
+                    ${pad(hour, 2)}:${pad(min, 2)}:${pad(sec,2)} - ${res.sentence}
+                </p>
+            </div>
+        `;
+
+        urlDict[`result-${i}`] = `https://www.youtube.com/watch?v=${videoCode}&t=${timeStamp}s`;
+    }
+    return urlDict;
+}
+
+
 function goToUrl(url) {
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
         const currTab = tabs[0];
@@ -108,46 +159,34 @@ function goToUrl(url) {
 async function search() {
     const bottomSpace = document.getElementsByClassName('bottom_blank_space')[0];
     bottomSpace.style.visibility = 'hidden';
-    
+
     const searchWordField = document.getElementById('searchWordField');
     const searchWord = searchWordField.value;
-    
+
     const resultView = document.getElementById('result');
     resultView.innerHTML = '';
-    const currentUrl = await getCurrentUrl(); //problem here
+
+    const currentUrl = await getCurrentUrl();
     const params = getUrlParams(currentUrl);
-    const videoCode = params['v'];
-    var vidCC = await requestApi('en', videoCode);
-    parsedCC = parseXML(vidCC);
-    
+    var videoCode = params['v'];
+
+    var vidType = await requestApi(videoCode);
+    const parsedType = parseXML(vidType);
+    var typeList = findCCType(parsedType);
+    var defaultName = typeList[0].name;
+    var defaultLang = typeList[0].langcode;
+
+    var vidCC = await requestApi(videoCode, defaultName, defaultLang);
+    const parsedCC = parseXML(vidCC);
     var timeStampsList = findTimeStamp(searchWord, parsedCC);
 
     const isResultExist = timeStampsList.length >= 1;
-    if(isResultExist) {
+    if (isResultExist) {
         bottomSpace.style.visibility = 'visible';
         resultView.style.paddingBottom = '10px';
     }
-    
-    const urlDict = {};
 
-
-    for (var i = 0; i < timeStampsList.length; i++) {
-        const res = timeStampsList[i];
-        const timeStamp = Math.round(+res.timestamp);
-        const min = parseInt(timeStamp / 60);
-        const sec = timeStamp%60;
-        resultView.innerHTML += `
-            <div class="card">
-                <p id="result-${i}">
-                    ${min}:${sec} - ${res.sentence}
-                </p>
-            </div>
-        `;
-
-
-        urlDict[`result-${i}`] = `https://www.youtube.com/watch?v=${videoCode}&t=${timeStamp}s`;
-    }
-
+    urlDict = displayResults(timeStampsList, resultView, videoCode);
 
     for (let id in urlDict) {
         const resultLine = document.getElementById(id);
