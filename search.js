@@ -3,10 +3,33 @@ const searchField = document.getElementById('searchWordField');
 
 searchField.focus();
 searchField.addEventListener('keydown', (event) => {
-    if (event.key === 'Enter') {
+    //if (event.key === 'Enter') {
         search();
-    }
+    //}
 });
+
+window.onload = async () => {
+    await loadDataToGlobalVariableFromAPI();
+    const searchWordField = document.getElementById('searchWordField');
+    searchWordField.disabled = false;
+};
+
+
+let videoCaption = null;
+let videoCode = null;
+async function loadDataToGlobalVariableFromAPI() {
+    const currentUrl = await getCurrentUrl();
+    const params = getUrlParams(currentUrl);
+    videoCode = params['v'];
+
+    var vidType = await requestApi(videoCode);
+    const parsedType = parseXML(vidType);
+    var typeList = findCCType(parsedType);
+    var defaultName = typeList[0].name;
+    var defaultLang = typeList[0].langcode;
+
+    videoCaption = await requestApi(videoCode, defaultName, defaultLang);
+}
 
 
 function getUrlParams(url) {
@@ -111,6 +134,7 @@ function findTimeStamp(searchWord, parsedCC) {
             });
         }
     }
+    
     return timeStamps;
 }
 
@@ -125,6 +149,7 @@ function pad(num, size) {
 function displayResults(list, resultView, videoCode) {
     const urlDict = {};
 
+    let tempDivs = "";
     for (var i = 0; i < list.length; i++) {
         const res = list[i];
         const timeStamp = Math.round(+res.timestamp);
@@ -132,7 +157,7 @@ function displayResults(list, resultView, videoCode) {
         const min = parseInt((timeStamp % 3600) / 60);
         const sec = timeStamp % 60;
 
-        resultView.innerHTML += `
+        tempDivs += `
             <div class="card">
                 <p id="result-${i}">
                     ${pad(hour, 2)}:${pad(min, 2)}:${pad(sec,2)} - ${res.sentence}
@@ -142,6 +167,8 @@ function displayResults(list, resultView, videoCode) {
 
         urlDict[`result-${i}`] = `https://www.youtube.com/watch?v=${videoCode}&t=${timeStamp}s`;
     }
+
+    resultView.innerHTML = tempDivs;
     return urlDict;
 }
 
@@ -166,18 +193,7 @@ async function search() {
     const resultView = document.getElementById('result');
     resultView.innerHTML = '';
 
-    const currentUrl = await getCurrentUrl();
-    const params = getUrlParams(currentUrl);
-    var videoCode = params['v'];
-
-    var vidType = await requestApi(videoCode);
-    const parsedType = parseXML(vidType);
-    var typeList = findCCType(parsedType);
-    var defaultName = typeList[0].name;
-    var defaultLang = typeList[0].langcode;
-
-    var vidCC = await requestApi(videoCode, defaultName, defaultLang);
-    const parsedCC = parseXML(vidCC);
+    const parsedCC = parseXML(videoCaption);
     var timeStampsList = findTimeStamp(searchWord, parsedCC);
 
     const isResultExist = timeStampsList.length >= 1;
