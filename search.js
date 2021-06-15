@@ -3,9 +3,7 @@ const searchField = document.getElementById('searchWordField');
 
 searchField.focus();
 searchField.addEventListener('keydown', (event) => {
-    //if (event.key === 'Enter') {
         search();
-    //}
 });
 
 window.onload = async () => {
