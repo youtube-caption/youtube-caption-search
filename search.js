@@ -1,17 +1,16 @@
 /* Entry of the code */
 const searchField = document.getElementById('searchWordField');
 
-searchField.focus();
-searchField.addEventListener('keydown', (event) => {
-        search();
-});
-
 window.onload = async () => {
     await loadDataToGlobalVariableFromAPI();
     const searchWordField = document.getElementById('searchWordField');
     searchWordField.disabled = false;
+    searchField.focus();
 };
 
+searchField.addEventListener('keydown', (event) => {
+        search();
+});
 
 let videoCaption = null;
 let videoCode = null;
