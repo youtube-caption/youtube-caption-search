@@ -110,11 +110,8 @@ function findCCType(parsedType) {
     var tupledTypes = [];
     var objType = parsedType.getElementsByTagName("track");
     for (var trackTag of objType) {
-        console.log(trackTag);
         let trackName = trackTag.getAttribute("name");
-        console.log(trackName);
         let trackLang = trackTag.getAttribute("lang_code");
-        console.log(trackLang);
         tupledTypes.push({
             name: trackName,
             langcode: trackLang,
@@ -195,7 +192,6 @@ async function search() {
     resultView.innerHTML = '';
 
     var timeStampsList = findTimeStamp(searchWord, parsedCaption);
-    console.log(searchWord, " : ", timeStampsList.length)
     if (timeStampsList.length >= 1) {
         bottomSpace.style.visibility = 'visible';
         resultView.style.paddingBottom = '10px';
