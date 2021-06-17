@@ -6,7 +6,7 @@ let parsedCaption = null;
 let videoCode = null;
 
 searchField.focus();
-searchField.addEventListener('keypress', (event) => {
+searchField.addEventListener('keyup', (event) => {
         search();
 });
 
