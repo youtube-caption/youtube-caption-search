@@ -1,8 +1,12 @@
 /* Entry of the code */
 const searchField = document.getElementById('searchWordField');
+const bottomSpace = document.getElementsByClassName('bottom_blank_space')[0];
+const resultView = document.getElementById('result');
+let parsedCaption = null;
+let videoCode = null;
 
 searchField.focus();
-searchField.addEventListener('keydown', (event) => {
+searchField.addEventListener('keypress', (event) => {
         search();
 });
 
@@ -13,20 +17,25 @@ window.onload = async () => {
 };
 
 
-let videoCaption = null;
-let videoCode = null;
-async function loadDataToGlobalVariableFromAPI() {
+async function getVideoCode() {
     const currentUrl = await getCurrentUrl();
     const params = getUrlParams(currentUrl);
-    videoCode = params['v'];
+    return params['v'];
+}
 
+
+async function loadDataToGlobalVariableFromAPI() {
+    videoCode = await getVideoCode();
     var vidType = await requestApi(videoCode);
+
     const parsedType = parseXML(vidType);
     var typeList = findCCType(parsedType);
+
     var defaultName = typeList[0].name;
     var defaultLang = typeList[0].langcode;
 
-    videoCaption = await requestApi(videoCode, defaultName, defaultLang);
+    videoCaption = await requestApi(defaultName, defaultLang);
+    parsedCaption = parseXML(videoCaption);
 }
 
 
@@ -66,7 +75,7 @@ function decodeSpecialCharacter(string) {
 }
 
 
-async function requestApi(videoCode, name = '', lang = '') {
+async function requestApi(name = '', lang = '') {
     return new Promise((resolve, reject) => {
         const request = new XMLHttpRequest();
         var url = `http://video.google.com/timedtext?type=list&v=${videoCode}`;
@@ -144,10 +153,7 @@ function pad(num, size) {
 }
 
 
-function displayResults(list, resultView, videoCode) {
-    const urlDict = {};
-
-    let tempDivs = "";
+function displayResults(list) {
     for (var i = 0; i < list.length; i++) {
         const res = list[i];
         const timeStamp = Math.round(+res.timestamp);
@@ -155,19 +161,19 @@ function displayResults(list, resultView, videoCode) {
         const min = parseInt((timeStamp % 3600) / 60);
         const sec = timeStamp % 60;
 
-        tempDivs += `
-            <div class="card">
-                <p id="result-${i}">
-                    ${pad(hour, 2)}:${pad(min, 2)}:${pad(sec,2)} - ${res.sentence}
-                </p>
-            </div>
-        `;
+        const div1 = document.createElement("div");
+        div1.className = "card";
+        const p1 = document.createElement("p");
+        p1.id = `result-${i}`;
+        p1.innerText = `${pad(hour, 2)}:${pad(min, 2)}:${pad(sec,2)} - ${res.sentence}`;
 
-        urlDict[`result-${i}`] = `https://www.youtube.com/watch?v=${videoCode}&t=${timeStamp}s`;
+        p1.addEventListener('click', () => {
+            goToUrl(`https://www.youtube.com/watch?v=${videoCode}&t=${timeStamp}s`);
+        })
+        
+        div1.appendChild(p1);
+        resultView.appendChild(div1);
     }
-
-    resultView.innerHTML = tempDivs;
-    return urlDict;
 }
 
 
@@ -181,31 +187,19 @@ function goToUrl(url) {
 }
 
 
+
+
 async function search() {
-    const bottomSpace = document.getElementsByClassName('bottom_blank_space')[0];
     bottomSpace.style.visibility = 'hidden';
-
-    const searchWordField = document.getElementById('searchWordField');
     const searchWord = searchWordField.value;
-
-    const resultView = document.getElementById('result');
     resultView.innerHTML = '';
 
-    const parsedCC = parseXML(videoCaption);
-    var timeStampsList = findTimeStamp(searchWord, parsedCC);
-
-    const isResultExist = timeStampsList.length >= 1;
-    if (isResultExist) {
+    var timeStampsList = findTimeStamp(searchWord, parsedCaption);
+    console.log(searchWord, " : ", timeStampsList.length)
+    if (timeStampsList.length >= 1) {
         bottomSpace.style.visibility = 'visible';
         resultView.style.paddingBottom = '10px';
     }
 
-    urlDict = displayResults(timeStampsList, resultView, videoCode);
-
-    for (let id in urlDict) {
-        const resultLine = document.getElementById(id);
-        resultLine.addEventListener('click', () => {
-            goToUrl(urlDict[id]);
-        })
-    }
+    displayResults(timeStampsList);
 }
