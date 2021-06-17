@@ -17,10 +17,6 @@ window.onload = async () => {
     searchField.focus();
 };
 
-searchField.addEventListener('keydown', (event) => {
-        search();
-});
-
 async function getVideoCode() {
     const currentUrl = await getCurrentUrl();
     const params = getUrlParams(currentUrl);
