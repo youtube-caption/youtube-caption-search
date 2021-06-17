@@ -14,8 +14,12 @@ window.onload = async () => {
     await loadDataToGlobalVariableFromAPI();
     const searchWordField = document.getElementById('searchWordField');
     searchWordField.disabled = false;
+    searchField.focus();
 };
 
+searchField.addEventListener('keydown', (event) => {
+        search();
+});
 
 async function getVideoCode() {
     const currentUrl = await getCurrentUrl();
