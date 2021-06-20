@@ -124,6 +124,21 @@ function findCCType(parsedType) {
 }
 
 
+function wrapWithSpanTag(sentence, word) {
+    const startIdx = sentence.indexOf(word);
+    const endIdx = startIdx + word.length;
+
+    if(startIdx === -1) {
+        return;
+    }
+
+    const beforeString = sentence.substring(0, startIdx);
+    const afterString = sentence.substring(endIdx, sentence.length);
+
+    return `${beforeString}<span class='highlight'>${word}</span>${afterString}`;
+}
+
+
 function findTimeStamp(searchWord, parsedCC) {
     var timeStamps = [];
     var objCC = parsedCC.getElementsByTagName("text");
@@ -134,6 +149,7 @@ function findTimeStamp(searchWord, parsedCC) {
         targetSentence = decodeSpecialCharacter(targetSentence);
 
         if (targetSentence.includes(searchWord)) {
+            targetSentence = wrapWithSpanTag(targetSentence, searchWord);
             var timeVal = textTag.getAttribute("start");
             timeStamps.push({
                 sentence: targetSentence,
@@ -165,7 +181,7 @@ function displayResults(list) {
         div1.className = "card";
         const p1 = document.createElement("p");
         p1.id = `result-${i}`;
-        p1.innerText = `${pad(hour, 2)}:${pad(min, 2)}:${pad(sec,2)} - ${res.sentence}`;
+        p1.innerHTML = `${pad(hour, 2)}:${pad(min, 2)}:${pad(sec,2)} - ${res.sentence}`;
 
         p1.addEventListener('click', () => {
             goToUrl(`https://www.youtube.com/watch?v=${videoCode}&t=${timeStamp}s`);
