@@ -95,28 +95,3 @@ p{
 .card:hover {
     background-color: rgba(175, 175, 175, 0.198);
 }
-
-#captionMenu {
-    position:fixed;
-    z-index:10000;
-    width:150px;
-    background: #1b1a1b;
-    border-radius: 5px;
-    display:none;
-}
-
-#captionMenu.visible{
-    display: block;
-}
-
-#captionMenu .ccProperty{
-    padding: 8px 10px;
-    font-size: 15px;
-    color: #eee;
-    cursor: pointer;
-    border-radius: inherit;
-}
-
-#captionMenu .ccProperty:hover{
-    background: #343434
-}

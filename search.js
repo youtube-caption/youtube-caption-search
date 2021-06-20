@@ -31,45 +31,12 @@ async function loadDataToGlobalVariableFromAPI() {
     const parsedType = parseXML(vidType);
     var typeList = findCCType(parsedType);
 
-    var selectName = typeList[0].name;
-    var selectLang = typeList[0].langcode;
+    var defaultName = typeList[0].name;
+    var defaultLang = typeList[0].langcode;
 
-    const menuBox = document.getElementById("captionMenu")
-
-    for (var i = 0; i < typeList.length; i++) {
-        let name = typeList[i].name;
-        let langCode = typeList[i].langcode;
-        
-        let div1 = document.createElement("div");
-        div1.className = "ccProperty";
-        div1.innerText = `${name} | ${langCode}`;
-
-        menuBox.appendChild(div1);
-    }   
-
-    videoCaption = await requestApi(selectName, selectLang);
+    videoCaption = await requestApi(defaultName, defaultLang);
     parsedCaption = parseXML(videoCaption);
 }
-
-const captionMenu = document.getElementById("captionMenu");
-const scope = document.querySelector("html");
-
-scope.addEventListener("contextmenu", (event) => {
-  event.preventDefault();
-
-  const { clientX: mouseX, clientY: mouseY } = event;
-
-  captionMenu.style.top = `${mouseY}px`;
-  captionMenu.style.left = `${mouseX}px`;
-
-  captionMenu.classList.add("visible");
-});
-
-scope.addEventListener("click", (e) => {
-    if (e.target.offsetParent != captionMenu) {
-      captionMenu.classList.remove("visible");
-    }
-  });
 
 
 function getUrlParams(url) {
@@ -217,6 +184,8 @@ function goToUrl(url) {
 }
 
 
+
+
 async function search() {
     bottomSpace.style.visibility = 'hidden';
     const searchWord = searchWordField.value;
@@ -230,5 +199,3 @@ async function search() {
 
     displayResults(timeStampsList);
 }
-
-
