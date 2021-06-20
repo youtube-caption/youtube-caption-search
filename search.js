@@ -47,6 +47,8 @@ async function loadDataToGlobalVariableFromAPI() {
         menuBox.appendChild(div1);
     }   
 
+    
+
     videoCaption = await requestApi(selectName, selectLang);
     parsedCaption = parseXML(videoCaption);
 }
