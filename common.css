@@ -95,3 +95,7 @@ p{
 .card:hover {
     background-color: rgba(175, 175, 175, 0.198);
 }
+
+.highlight {
+    background-color: aquamarine;
+}
