@@ -17,6 +17,7 @@ window.onload = async () => {
     searchField.focus();
 };
 
+
 async function getVideoCode() {
     const currentUrl = await getCurrentUrl();
     const params = getUrlParams(currentUrl);
@@ -109,6 +110,7 @@ function parseXML(vidCC) {
 function findCCType(parsedType) {
     var tupledTypes = [];
     var objType = parsedType.getElementsByTagName("track");
+    
     for (var trackTag of objType) {
         let trackName = trackTag.getAttribute("name");
         let trackLang = trackTag.getAttribute("lang_code");
@@ -117,6 +119,7 @@ function findCCType(parsedType) {
             langcode: trackLang,
         });
     }
+    
     return tupledTypes;
 }
 
@@ -182,8 +185,6 @@ function goToUrl(url) {
         }
     });
 }
-
-
 
 
 async function search() {
