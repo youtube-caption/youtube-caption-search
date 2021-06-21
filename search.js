@@ -2,6 +2,8 @@
 const searchField = document.getElementById('searchWordField');
 const bottomSpace = document.getElementsByClassName('bottom_blank_space')[0];
 const resultView = document.getElementById('result');
+const searchBox = document.getElementById('search_box');
+
 let parsedCaption = null;
 let videoCode = null;
 
@@ -9,6 +11,32 @@ searchField.focus();
 searchField.addEventListener('keyup', (event) => {
         search();
 });
+
+
+searchBox.addEventListener('wheel', (event) => {
+    changeSearchBox();
+});
+
+const InputType = Object.freeze({'SEARCH_BOX': 0, 'LANGUAGE': 1});
+let now = InputType.SEARCH_BOX;
+function changeSearchBox() {
+    const textBox = document.getElementById('searchWordField');
+    const languageSelect = document.getElementById('lang');
+    const image = document.getElementById('img');
+
+    if(now == InputType.SEARCH_BOX) {
+        textBox.style = "display: none;"
+        image.style = "display: none;";
+        languageSelect.style = "";
+        now = InputType.LANGUAGE;
+    } else {
+        textBox.style = "";
+        image.style = "";
+        languageSelect.style = "display: none;";
+        now = InputType.SEARCH_BOX;
+    }
+}
+
 
 window.onload = async () => {
     await loadDataToGlobalVariableFromAPI();
@@ -25,6 +53,7 @@ async function getVideoCode() {
 }
 
 
+const languages = [];
 async function loadDataToGlobalVariableFromAPI() {
     videoCode = await getVideoCode();
     var vidType = await requestApi(videoCode);
@@ -35,44 +64,16 @@ async function loadDataToGlobalVariableFromAPI() {
     var selectName = typeList[0].name;
     var selectLang = typeList[0].langcode;
 
-    const menuBox = document.getElementById("captionMenu")
+    for(const type of typeList) {
+        languages.push({
+            name: type.name,
+            langCode: type.langcode,
+        })
+    }
 
-    for (var i = 0; i < typeList.length; i++) {
-        let name = typeList[i].name;
-        let langCode = typeList[i].langcode;
-        
-        let div1 = document.createElement("div");
-        div1.className = "ccProperty";
-        div1.innerText = `${name} | ${langCode}`;
-
-        menuBox.appendChild(div1);
-    }   
-
-    
-
-    videoCaption = await requestApi(selectName, selectLang);
+    const videoCaption = await requestApi(selectName, selectLang);
     parsedCaption = parseXML(videoCaption);
 }
-
-const captionMenu = document.getElementById("captionMenu");
-const scope = document.querySelector("html");
-
-scope.addEventListener("contextmenu", (event) => {
-  event.preventDefault();
-
-  const { clientX: mouseX, clientY: mouseY } = event;
-
-  captionMenu.style.top = `${mouseY}px`;
-  captionMenu.style.left = `${mouseX}px`;
-
-  captionMenu.classList.add("visible");
-});
-
-scope.addEventListener("click", (e) => {
-    if (e.target.offsetParent != captionMenu) {
-      captionMenu.classList.remove("visible");
-    }
-  });
 
 
 function getUrlParams(url) {
@@ -201,6 +202,19 @@ function pad(num, size) {
     num = num.toString();
     while (num.length < size) num = "0" + num;
     return num;
+}
+
+
+function displayLanguages() {
+    resultView.innerHTML = '';
+    for(const lang of languages) {
+        const div1 = document.createElement("div");
+        div1.className = "card";
+        const p1 = document.createElement("p");
+        p1.innerText = lang.langCode;
+        div1.appendChild(p1);
+        resultView.appendChild(div1);
+    }
 }
 
 
