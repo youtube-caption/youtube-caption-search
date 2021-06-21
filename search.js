@@ -7,14 +7,16 @@ const searchBox = document.getElementById('search_box');
 let parsedCaption = null;
 let videoCode = null;
 
+
 searchField.focus();
 searchField.addEventListener('keyup', (event) => {
-        search();
+    search();
 });
 
 
-searchBox.addEventListener('wheel', (event) => {
-    changeSearchBox();
+searchBox.addEventListener('contextmenu', (event) => {
+        event.preventDefault();
+        changeSearchBox();
 });
 
 const InputType = Object.freeze({'SEARCH_BOX': 0, 'LANGUAGE': 1});
@@ -34,6 +36,7 @@ function changeSearchBox() {
         image.style = "";
         languageSelect.style = "display: none;";
         now = InputType.SEARCH_BOX;
+        searchField.focus();
     }
 }
 
@@ -61,18 +64,32 @@ async function loadDataToGlobalVariableFromAPI() {
     const parsedType = parseXML(vidType);
     var typeList = findCCType(parsedType);
 
-    var selectName = typeList[0].name;
-    var selectLang = typeList[0].langcode;
+    const languageSelect = document.getElementById('lang');
 
-    for(const type of typeList) {
-        languages.push({
-            name: type.name,
-            langCode: type.langcode,
-        })
+    for (var i = 0; i < typeList.length; i++) {
+        let name = typeList[i].name;
+        let langCode = typeList[i].langcode;
+        
+        let option1 = document.createElement("option");
+        option1.className = "ccProperty";
+        option1.innerText = `${name} | ${langCode}`;
+        option1.value = JSON.stringify({
+            name,
+            langCode,
+        });
+
+        languageSelect.appendChild(option1);
     }
 
-    const videoCaption = await requestApi(selectName, selectLang);
-    parsedCaption = parseXML(videoCaption);
+    languageSelect.addEventListener('click', async (event) => {
+        if(event.target.selectedIndex === 0) return;
+        const language = JSON.parse(event.target.value);
+        console.log(language.name, language.langCode);
+        const videoCaption = await requestApi(language.name, language.langCode);
+        parsedCaption = parseXML(videoCaption);
+        changeSearchBox();
+        event.target.selectedIndex = 0;
+    });
 }
 
 
@@ -119,6 +136,8 @@ async function requestApi(name = '', lang = '') {
         if (lang != '') {
             url = `http://video.google.com/timedtext?name=${name}&lang=${lang}&v=${videoCode}`;
         }
+
+        console.log(url);
         request.open('GET', url);
 
         request.onload = function () {
@@ -175,9 +194,9 @@ function wrapWithSpanTag(sentence, word) {
 }
 
 
-function findTimeStamp(searchWord, parsedCC) {
+function findTimeStamp(searchWord) {
     var timeStamps = [];
-    var objCC = parsedCC.getElementsByTagName("text");
+    var objCC = parsedCaption.getElementsByTagName("text");
 
     for (var textTag of objCC) {
         let targetSentence = textTag.childNodes[0].nodeValue;
@@ -257,7 +276,7 @@ async function search() {
     const searchWord = searchWordField.value;
     resultView.innerHTML = '';
 
-    var timeStampsList = findTimeStamp(searchWord, parsedCaption);
+    var timeStampsList = findTimeStamp(searchWord);
     if (timeStampsList.length >= 1) {
         bottomSpace.style.visibility = 'visible';
         resultView.style.paddingBottom = '10px';
@@ -265,5 +284,3 @@ async function search() {
 
     displayResults(timeStampsList);
 }
-
-
