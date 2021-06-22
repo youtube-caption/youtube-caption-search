@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 /* Entry of the code */
 const searchField = document.getElementById('searchWordField');
 const bottomSpace = document.getElementsByClassName('bottom_blank_space')[0];
@@ -252,4 +253,8 @@ async function search() {
     displayResults(timeStampsList);
 }
 
+=======
+import { SearchEngine } from './search_engine.js';
+>>>>>>> Stashed changes
 
+new SearchEngine();
