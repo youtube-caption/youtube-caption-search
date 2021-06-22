@@ -20,27 +20,33 @@ p{
     font-size: 13px;
 }
 
-
 .vertical_align {
     top: 50%;
     -ms-transform: translateY(30%);
     transform: translateY(25%);
 }
 
-#searchWordField{
+#searchWordField, #lang{
     width:90%;
     height: 30px;
     border-radius: 25px;
     border:1px solid #dcdcdc;
     text-align: center;
     font-size: 20px;
+    padding: 0;
+    margin: 0;
+    box-sizing: content-box;
 }
 
-#searchWordField:focus{
+#lang {
+    height: 30px;
+}
+
+#searchWordField:focus, #lang:focus{
     outline: none;
 }
 
-#searchWordField:hover{
+#searchWordField:hover, #lang:hover{
   box-shadow: 1px 1px 8px 1px rgba(0, 0, 0, 0.493);
 }
 
