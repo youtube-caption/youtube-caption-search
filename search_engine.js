@@ -56,7 +56,7 @@ export class SearchEngine {
             if(event.target.selectedIndex === 0) return;
 
             const language = JSON.parse(event.target.value);
-            this.caption = await this.dataLoader.getCaption(languaeg.name, language.langCode);
+            this.caption = await this.dataLoader.getCaption(language.name, language.langCode);
             
             this.changeSearchBox();
             event.target.selectedIndex = 0;
