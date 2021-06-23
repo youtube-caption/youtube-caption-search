@@ -60,6 +60,13 @@ p{
     left: 0;
 }
 
+.error-message{
+    text-align: center;
+    font-size: 15px;
+    color: #2e2222;
+    margin-top: -15px;
+}
+
 .search-button {
     position: absolute;
     background: transparent;
