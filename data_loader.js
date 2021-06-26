@@ -5,6 +5,15 @@ export class DataLoader {
         this.urlParser = new URLParser();
     }
 
+    async getDefaultCC() {
+        const languages = await this.getCaptionType();
+        for (const language of languages) {
+            if ((language.langcode).includes("en")) {
+                return (language);
+            }
+        }
+        return (languages[0]);
+    }
 
     async getCaption(name, langCode) {
         const videoCode = await this.urlParser.getVideoCode();
@@ -19,10 +28,8 @@ export class DataLoader {
         const url = `http://video.google.com/timedtext?type=list&v=${videoCode}`;
         const response = await this.fetchAPI(url);
         const parsedCaptionType = this.parseXML(response);
-        console.log(parsedCaptionType)
         return this.findCCType(parsedCaptionType);
     }
-
 
     async fetchAPI(url) {
         return new Promise((resolve, reject) => {
