@@ -20,15 +20,19 @@ export class SearchEngine {
         (async () => {
             this.videoCode = await this.urlInfo.getVideoCode();
             this.getDefaultCC = await this.dataLoader.getDefaultCC();
-            if(typeof this.getDefaultCC === "undefined"){
-                console.log("No Captions Found");
+
+            try {
+                this.caption = await this.dataLoader.getCaption((this.getDefaultCC).name, (this.getDefaultCC).langcode);
+            }
+            catch(error) {
                 const search = document.getElementById('search_box');
                 const noCCMessage = document.createElement("p");
                 noCCMessage.className = "error-message";
                 noCCMessage.innerHTML = `No Captions Found`;
                 search.appendChild(noCCMessage);
+                console.log(error);
+                return;
             }
-            this.caption = await this.dataLoader.getCaption((this.getDefaultCC).name, (this.getDefaultCC).langcode);
             this.addEventListeners();
             this.enableSearchBox();
         })();
@@ -56,8 +60,9 @@ export class SearchEngine {
             option.className = "ccProperty";
             if (language.name == '') {
                 option.innerText = `${language.langcode}`;
+            } else {
+                option.innerText = `${language.name} | ${language.langcode}`;
             }
-            option.innerText = `${language.name} | ${language.langcode}`;
             option.value = JSON.stringify({
                 name: language.name,
                 langCode: language.langcode
