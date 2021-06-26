@@ -45,7 +45,7 @@ export class SearchEngine {
         });
 
         this.searchBox.addEventListener('contextmenu', (event) => {
-            //event.preventDefault();
+            event.preventDefault();
             this.changeSearchBox();
         });
     }
