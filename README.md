@@ -1,20 +1,20 @@
 # Youtube Caption Search
 ### by Joon Ha Kim & Yun Bin Chang [@Techbless](https://github.com/techbless)
 
-Ctrl + F for Youtube. Still on Development.
+Ctrl + F for Youtube.
 
-Errors to fix:
-9 JUN 21
-1. some youtube videos don't work on the transcript pulling website
-2. make user interface pretty 
-   1. change button to smth else that accepts "click" - or change button design
-   2. add design features (header / body / animations)
+Version 1.0.0
 
-10 JUN 21
-1. check problem with some youtube links that don't work with transcript generating website
-2. make a shortcut key-bind for the extension
-3. error pop-ups
-    1. no results found
-    2. not a proper youtube link to access
-    3. no transcript found for youtube video (found error: change link to cc finder (type=list), and get the required lang-code to display cc)
-    4. drop down for languages
+When watching captioned videos on YouTube, it is easy to miss words and very difficult to find the specific time at which that word was used. With this chrome-extension, you can look up your word on the video, and get the timestamped link of that word.
+
+HOW-TO-USE:
+
+1. Go on any YouTube video that supports captions. 
+2. The default language is either English, or the first options from the captions list supported by the video.
+3. To change the caption-language, RIGHT-CLICK for the drop-down menu to pop up.
+4. Search, Click, and Watch.
+
+For any questions or problems regarding the extension, please feel free to contact us at:
+
+jhk.james1110@gmail.com
+techbless@gmail.com
