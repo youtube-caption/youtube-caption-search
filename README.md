@@ -1,5 +1,5 @@
 # Youtube Caption Search
-### by Joon Ha Kim & Yun Bin Chang [@Techbless](https://github.com/techbless)
+### by Joon Ha Kim & Yun Bin Chang
 
 Ctrl + F for Youtube.
 
@@ -17,4 +17,5 @@ HOW-TO-USE:
 For any questions or problems regarding the extension, please feel free to contact us at:
 
 jhk.james1110@gmail.com
+
 techbless@gmail.com
