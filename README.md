@@ -1,6 +1,8 @@
 # Youtube Caption Search
 ### by Joon Ha Kim & Yun Bin Chang
 
+LINK TO CHROME WEB STORE: https://chrome.google.com/webstore/detail/youtube-caption-search/alcejjedepbmlebojpoomnelfmicphpp?hl=en&authuser=0
+
 Ctrl + F for Youtube.
 
 Version 1.0.0
